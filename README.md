@@ -1,4 +1,4 @@
-# Bittensor Logger Module
+# Hannibal Logger Module
 
 A custom Python logging module with colorized output and EST timestamps.  
 Displays full file path and line number for each log message.
