@@ -1,0 +1,9 @@
+README.md
+setup.py
+hannibal_logger.egg-info/PKG-INFO
+hannibal_logger.egg-info/SOURCES.txt
+hannibal_logger.egg-info/dependency_links.txt
+hannibal_logger.egg-info/requires.txt
+hannibal_logger.egg-info/top_level.txt
+hlogger/__init__.py
+hlogger/hlogger.py
