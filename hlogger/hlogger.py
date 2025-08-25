@@ -12,6 +12,10 @@ LOG_COLORS = {
 RESET_COLOR = "\033[0m"
 
 class ESTFormatter(logging.Formatter):
+    def __init__(self, fmt=None, datefmt=None, session=""):
+        super().__init__(fmt, datefmt)
+        self.session = session
+
     def formatTime(self, record, datefmt=None):
         est = pytz.timezone("US/Eastern")
         dt = datetime.fromtimestamp(record.created, est)
@@ -20,10 +24,15 @@ class ESTFormatter(logging.Formatter):
     def format(self, record):
         color = LOG_COLORS.get(record.levelname, "")
         message = super().format(record)
-        return f"{color}{message}{RESET_COLOR}"
+        session_str = f"[{self.session}] " if self.session else ""
+        return f"{color}{session_str}{message}{RESET_COLOR}"
+
+    def set_session(self, session):
+        self.session = session
 
 class StaticLogger:
     _logger = None
+    _formatter = None
 
     @staticmethod
     def get_logger(name=None, level=logging.DEBUG):
@@ -32,19 +41,25 @@ class StaticLogger:
             logger.setLevel(level)
             if not logger.handlers:
                 handler = logging.StreamHandler()
-                formatter = ESTFormatter(
+                StaticLogger._formatter = ESTFormatter(
                     "%(asctime)s - %(levelname)s - %(pathname)s:%(lineno)d - %(message)s"
                 )
-                handler.setFormatter(formatter)
+                handler.setFormatter(StaticLogger._formatter)
                 logger.addHandler(handler)
             StaticLogger._logger = logger
         return StaticLogger._logger
+
+    @staticmethod
+    def setSession(session):
+        if StaticLogger._formatter is not None:
+            StaticLogger._formatter.set_session(session)
 
 # Example usage
 if __name__ == "__main__":
     logger = StaticLogger.get_logger()
     logger.debug("This is a debug message.\nThis is a debug message.")
     logger.info("This is an info message.")
+    StaticLogger.setSession("session-123")
     logger.warning("This is a warning message.")
     logger.error("This is an error message.")
     logger.critical("This is a critical message.")
